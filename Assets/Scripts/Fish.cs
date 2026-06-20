@@ -94,23 +94,6 @@ public class Fish : Collectible
         directionTimer = Random.Range(directionChangeIntervalMin, directionChangeIntervalMax);
     }
 
-    /*public override void OnHitByLaser()
-    {
-        float penalty = PlayerStats.Instance != null ? PlayerStats.Instance.CurrentFishPenalty : 5f;
-
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.ApplyTimePenalty(penalty);
-        }
-
-        if (penaltyEffectPrefab != null)
-        {
-            Instantiate(penaltyEffectPrefab, transform.position, Quaternion.identity);
-        }
-
-        Destroy(gameObject);
-    }*/
-
     public override void OnHitByLaser()
     {
         if (isDead)
