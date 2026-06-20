@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tutorial
   m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
   npcName: Fisherman Joe
-  npcPortrait: {fileID: 21300000, guid: 4ac5326d00f0447baa4119a63015775c, type: 3}
+  npcPortrait: {fileID: -3663117883524363142, guid: 87b7217ab79884d4a8d63bf6fe30eb77, type: 3}
   dialogueLines:
   - ARRRRGHHHHHHHHH- ok thats a bit old fashioned gobbledyegook.
   - Hey there sailor! My name is joe, I will be assisting your sweep for this evening
