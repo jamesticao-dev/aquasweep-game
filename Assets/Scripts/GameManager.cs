@@ -48,6 +48,8 @@ public class GameManager : MonoBehaviour
     public event Action<GameState> OnStateChanged;
     public event Action<int> OnCoinsChanged;             // passes new total coins
 
+    public System.Action<int> OnFishKillsChanged;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -112,6 +114,9 @@ public class GameManager : MonoBehaviour
     {
         carriedTrash = 0;
         OnCarriedTrashChanged?.Invoke(carriedTrash);
+
+        fishKills = 0;
+        OnFishKillsChanged?.Invoke(fishKills);
 
         float roundTime = PlayerStats.Instance != null ? PlayerStats.Instance.CurrentRoundTime : 60f;
         timeRemaining = roundTime;
@@ -223,6 +228,8 @@ public class GameManager : MonoBehaviour
         currentRound = 1;
         carriedTrash = 0;
         timeRemaining = 0f;
+        fishKills = 0;
+        OnFishKillsChanged?.Invoke(fishKills);
 
         // stop gameplay systems
         if (spawnManager != null)
@@ -240,5 +247,13 @@ public class GameManager : MonoBehaviour
 
         // go back to menu state
         SetState(GameState.MainMenu);
+    }
+
+    private int fishKills = 0;
+
+    public void AddFishKill()
+    {
+        fishKills++;
+        OnFishKillsChanged?.Invoke(fishKills);
     }
 }

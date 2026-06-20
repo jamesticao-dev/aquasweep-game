@@ -51,6 +51,7 @@ public class PlayerStats : MonoBehaviour
     public float fishPenaltyReductionStep = 1f;
     public int fishPenaltyLevel = 0;
     public int maxFishPenaltyLevel = 4; // can't reduce below ~1s
+    public int fishKills = 0;
 
     [Header("Magnet")]
     public float baseMagnetRadius = 0f; // 0 = no magnet effect
@@ -110,9 +111,17 @@ public class PlayerStats : MonoBehaviour
         coins += amount;
     }
 
+    public int CurrentFishKills { get; private set; }
+
+    public void AddFishKill()
+    {
+        CurrentFishKills++;
+    }
+
     public void ResetStats()
     {
         coins = 0;
+        CurrentFishKills = 0;
 
         moveSpeedLevel = 0;
         fireRateLevel = 0;

@@ -14,6 +14,7 @@ public class GameHUD : MonoBehaviour
     public TMP_Text carriedTrashText;
     public TMP_Text coinsText;
     public TMP_Text statusText; // shows prompts like "Return to drop-off!"
+    public TMP_Text fishKillsText;
 
     [Header("Panels")]
     public GameObject gameOverPanel;
@@ -63,6 +64,7 @@ public class GameHUD : MonoBehaviour
             return;
         }
 
+        GameManager.Instance.OnFishKillsChanged += HandleFishKillsChanged;
         GameManager.Instance.OnTimerUpdated += HandleTimerUpdated;
         GameManager.Instance.OnCarriedTrashChanged += HandleCarriedTrashChanged;
         GameManager.Instance.OnCoinsChanged += HandleCoinsChanged;
@@ -78,12 +80,14 @@ public class GameHUD : MonoBehaviour
             HandleTimerUpdated(PlayerStats.Instance.CurrentRoundTime);
         }
         HandleCarriedTrashChanged(0);
+        HandleFishKillsChanged(0);
     }
 
     private void Unsubscribe()
     {
         if (!isSubscribed || GameManager.Instance == null) return;
 
+        GameManager.Instance.OnFishKillsChanged -= HandleFishKillsChanged;
         GameManager.Instance.OnTimerUpdated -= HandleTimerUpdated;
         GameManager.Instance.OnCarriedTrashChanged -= HandleCarriedTrashChanged;
         GameManager.Instance.OnCoinsChanged -= HandleCoinsChanged;
@@ -108,29 +112,6 @@ public class GameHUD : MonoBehaviour
     {
         if (coinsText != null) coinsText.text = $"Highest Coins Collected: {coins}";
     }
-
-    /*private void HandleStateChanged(GameManager.GameState state)
-    {
-        if (statusText == null) return;
-
-        switch (state)
-        {
-            case GameManager.GameState.MainMenu:
-                statusText.text = "";
-                if (timerText != null) timerText.text = "";
-                if (carriedTrashText != null) carriedTrashText.text = "";
-                break;
-            case GameManager.GameState.Playing:
-                statusText.text = "Shoot trash and deposit anytime!";
-                break;
-            case GameManager.GameState.Shop:
-                statusText.text = "Round complete! Spend your coins.";
-                break;
-            case GameManager.GameState.GameOver:
-                statusText.text = "Times up! Game Over!";
-                break;
-        }
-    }*/
 
     private void HandleStateChanged(GameManager.GameState state)
     {
@@ -171,5 +152,11 @@ public class GameHUD : MonoBehaviour
         {
             statusText.text = $"Hit a fish! -{penaltyAmount:0}s";
         }
+    }
+
+    private void HandleFishKillsChanged(int count)
+    {
+        if (fishKillsText != null)
+            fishKillsText.text = $"Fish Killed: {count}";
     }
 }

@@ -120,6 +120,11 @@ public class Fish : Collectible
 
         SoundEffectManager.Play("Vaporized");
 
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddFishKill();
+        }
+
         float penalty = PlayerStats.Instance != null ?
                         PlayerStats.Instance.CurrentFishPenalty : 5f;
 
