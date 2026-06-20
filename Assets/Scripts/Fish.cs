@@ -21,12 +21,32 @@ public class Fish : Collectible
     private float directionTimer;
     private Vector2 spawnPoint;
 
+    [Header("Movement Bounds")]
+    public Vector2 boundsCenter = Vector2.zero;
+    public Vector2 boundsSize = new Vector2(16f, 9f);
+
+    [Header("Death")]
+    public float deathDelay = 1f;
+
+    private bool isDead = false;
+    private Animator animator;
+    private Collider2D col;
+
     protected override void Start()
     {
+
+        if (isDead)
+        return;
+
+        base.Update();
         base.Start();
-        magnetable = false; // fish should swim away from / ignore the magnet, not get reeled in
+
+        magnetable = false;
         spawnPoint = transform.position;
         PickNewDirection();
+
+        animator = GetComponent<Animator>();
+        col = GetComponent<Collider2D>();
     }
 
     protected override void Update()
@@ -39,10 +59,22 @@ public class Fish : Collectible
             PickNewDirection();
         }
 
-        // If wandered too far from spawn point, steer back toward it
-        if (Vector2.Distance(transform.position, spawnPoint) > levelBoundsRadius)
+        float minX = boundsCenter.x - boundsSize.x / 2f;
+        float maxX = boundsCenter.x + boundsSize.x / 2f;
+        float minY = boundsCenter.y - boundsSize.y / 2f;
+        float maxY = boundsCenter.y + boundsSize.y / 2f;
+
+        Vector2 pos = transform.position;
+
+        // Turn around if reaching edges
+        if (pos.x <= minX || pos.x >= maxX)
         {
-            swimDirection = (spawnPoint - (Vector2)transform.position).normalized;
+            swimDirection.x *= -1;
+        }
+
+        if (pos.y <= minY || pos.y >= maxY)
+        {
+            swimDirection.y *= -1;
         }
 
         transform.position += (Vector3)(swimDirection * swimSpeed * Time.deltaTime);
@@ -62,7 +94,7 @@ public class Fish : Collectible
         directionTimer = Random.Range(directionChangeIntervalMin, directionChangeIntervalMax);
     }
 
-    public override void OnHitByLaser()
+    /*public override void OnHitByLaser()
     {
         float penalty = PlayerStats.Instance != null ? PlayerStats.Instance.CurrentFishPenalty : 5f;
 
@@ -77,5 +109,34 @@ public class Fish : Collectible
         }
 
         Destroy(gameObject);
+    }*/
+
+    public override void OnHitByLaser()
+    {
+        if (isDead)
+            return;
+
+        isDead = true;
+
+        float penalty = PlayerStats.Instance != null ?
+                        PlayerStats.Instance.CurrentFishPenalty : 5f;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ApplyTimePenalty(penalty);
+        }
+
+        if (penaltyEffectPrefab != null)
+        {
+            Instantiate(penaltyEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        if (col != null)
+            col.enabled = false;
+
+        if (animator != null)
+            animator.SetTrigger("Die");
+
+        Destroy(gameObject, deathDelay);
     }
 }

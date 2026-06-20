@@ -9,8 +9,8 @@ using System.Collections.Generic;
 public class SpawnManager : MonoBehaviour
 {
     [Header("Prefabs")]
-    public GameObject trashPrefab;
-    public GameObject fishPrefab;
+    public GameObject[] trashPrefabs;
+    public GameObject[] fishPrefabs;
 
     [Header("Spawn Area")]
     public Vector2 spawnAreaCenter = Vector2.zero;
@@ -89,17 +89,29 @@ public class SpawnManager : MonoBehaviour
 
     private void SpawnTrash()
     {
-        if (trashPrefab == null) return;
+        if (trashPrefabs == null || trashPrefabs.Length == 0) return;
+
         Vector2 pos = GetRandomSpawnPosition();
-        GameObject obj = Instantiate(trashPrefab, pos, Quaternion.identity);
+
+        GameObject selectedPrefab =
+            trashPrefabs[Random.Range(0, trashPrefabs.Length)];
+
+        GameObject obj = Instantiate(selectedPrefab, pos, Quaternion.identity);
+
         activeTrash.Add(obj);
     }
 
     private void SpawnFish()
     {
-        if (fishPrefab == null) return;
+        if (fishPrefabs == null || fishPrefabs.Length == 0) return;
+
         Vector2 pos = GetRandomSpawnPosition();
-        GameObject obj = Instantiate(fishPrefab, pos, Quaternion.identity);
+
+        GameObject selectedPrefab =
+            fishPrefabs[Random.Range(0, fishPrefabs.Length)];
+
+        GameObject obj = Instantiate(selectedPrefab, pos, Quaternion.identity);
+
         activeFish.Add(obj);
     }
 
