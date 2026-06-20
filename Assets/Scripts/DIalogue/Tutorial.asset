@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 357816027668b4de595065636c2202c2, type: 3}
   m_Name: Tutorial
   m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
-  npcName: 
-  npcPortrait: {fileID: 0}
-  dialogueLines: []
-  autoProgressLines: 
+  npcName: Fisherman Joe
+  npcPortrait: {fileID: 21300000, guid: 4ac5326d00f0447baa4119a63015775c, type: 3}
+  dialogueLines:
+  - Ahoy
+  - Bye
+  autoProgressLines: 0101
   autoProgressDelay: 1.5
   typingSpeed: 0.05
-  voiceSound: {fileID: 0}
+  voiceSound: {fileID: 8300000, guid: 981857aff18474af7a0a64bb71ce7e94, type: 3}
   voicePitch: 1
