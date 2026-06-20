@@ -118,6 +118,8 @@ public class Fish : Collectible
 
         isDead = true;
 
+        SoundEffectManager.Play("Vaporized");
+
         float penalty = PlayerStats.Instance != null ?
                         PlayerStats.Instance.CurrentFishPenalty : 5f;
 

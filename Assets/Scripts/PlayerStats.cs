@@ -109,4 +109,21 @@ public class PlayerStats : MonoBehaviour
     {
         coins += amount;
     }
+
+    public void ResetStats()
+    {
+        coins = 0;
+
+        moveSpeedLevel = 0;
+        fireRateLevel = 0;
+        laserSpeedLevel = 0;
+        laserCountLevel = 0;
+
+        bonusTimeLevel = 0;
+        trashValueLevel = 0;
+        fishPenaltyLevel = 0;
+
+        magnetLevel = 0;
+        dashUnlocked = false;
+    }
 }

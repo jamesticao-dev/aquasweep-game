@@ -24,6 +24,8 @@ public class Trash : Collectible
 
     private void Collect()
     {
+        SoundEffectManager.Play("Collect");
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.AddCarriedTrash(1);

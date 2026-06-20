@@ -44,6 +44,7 @@ public class LaserShooter : MonoBehaviour
 
     private void Fire()
     {
+        SoundEffectManager.Play("Laser");
         if (laserPrefab == null || mainCamera == null) return;
 
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);

@@ -85,7 +85,7 @@ public class UpgradeShop : MonoBehaviour
     private void RefreshDisplay()
     {
         if (PlayerStats.Instance == null) return;
-        if (coinsText != null) coinsText.text = $"Coins: {PlayerStats.Instance.coins}";
+        if (coinsText != null) coinsText.text = $"Available Coins: {PlayerStats.Instance.coins}";
         if (roundText != null && GameManager.Instance != null) roundText.text = $"Round {GameManager.Instance.currentRound} Complete!";
     }
 
@@ -99,6 +99,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = s.GetUpgradeCost(s.moveSpeedLevel);
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.moveSpeedLevel++;
             RefreshDisplay();
         }
@@ -111,6 +112,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = s.GetUpgradeCost(s.fireRateLevel);
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.fireRateLevel++;
             RefreshDisplay();
         }
@@ -123,6 +125,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = s.GetUpgradeCost(s.laserSpeedLevel);
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.laserSpeedLevel++;
             RefreshDisplay();
         }
@@ -135,6 +138,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = s.GetUpgradeCost(s.laserCountLevel * 3); // pricier scaling since it's strong
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.laserCountLevel++;
             RefreshDisplay();
         }
@@ -147,6 +151,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = s.GetUpgradeCost(s.bonusTimeLevel * 2);
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.bonusTimeLevel++;
             RefreshDisplay();
         }
@@ -159,6 +164,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = s.GetUpgradeCost(s.trashValueLevel);
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.trashValueLevel++;
             RefreshDisplay();
         }
@@ -171,6 +177,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = s.GetUpgradeCost(s.fishPenaltyLevel);
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.fishPenaltyLevel++;
             RefreshDisplay();
         }
@@ -183,6 +190,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = s.GetUpgradeCost(s.magnetLevel * 2);
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.magnetLevel++;
             RefreshDisplay();
         }
@@ -195,6 +203,7 @@ public class UpgradeShop : MonoBehaviour
         int cost = 30; // flat one-time cost
         if (s.TrySpendCoins(cost))
         {
+            SoundEffectManager.Play("Purchase");
             s.dashUnlocked = true;
             RefreshDisplay();
         }

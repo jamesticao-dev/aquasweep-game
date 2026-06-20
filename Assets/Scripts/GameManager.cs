@@ -100,6 +100,9 @@ public class GameManager : MonoBehaviour
 
             if (spawnManager != null)
                 spawnManager.StopSpawning();
+
+            if (PlayerStats.Instance != null)
+                PlayerStats.Instance.ResetStats();
         }
     }
 
@@ -126,60 +129,6 @@ public class GameManager : MonoBehaviour
         if (spawnManager != null) spawnManager.StartSpawning();
     }
 
-    /*private void EnterDropOffPhase()
-    {
-        SetState(GameState.DropOff);
-        if (spawnManager != null) spawnManager.StopSpawning();
-        // UI should now show "Return to drop-off point!" prompt.
-        // If carriedTrash == 0, you could skip straight to shop:
-        if (carriedTrash <= 0)
-        {
-            EnterShopPhase();
-        }
-    }*/
-
-    /*public void ConvertCarriedTrashToCoins()
-    {
-        if (CurrentState != GameState.DropOff) return;
-        if (carriedTrash <= 0) return;
-
-        float coinValue = PlayerStats.Instance != null ? PlayerStats.Instance.CurrentTrashCoinValue : 1f;
-        int coinsEarned = Mathf.RoundToInt(carriedTrash * coinValue);
-
-        if (PlayerStats.Instance != null)
-        {
-            PlayerStats.Instance.AddCoins(coinsEarned);
-            OnCoinsChanged?.Invoke(PlayerStats.Instance.coins);
-        }
-
-        carriedTrash = 0;
-        OnCarriedTrashChanged?.Invoke(carriedTrash);
-
-        EnterShopPhase();
-    }
-    public void ConvertCarriedTrashToCoins()
-    {
-        if (CurrentState == GameState.GameOver)
-            return;
-
-        if (carriedTrash <= 0)
-            return;
-
-        float coinValue = PlayerStats.Instance != null ?
-                        PlayerStats.Instance.CurrentTrashCoinValue : 1f;
-
-        int coinsEarned = Mathf.RoundToInt(carriedTrash * coinValue);
-
-        if (PlayerStats.Instance != null)
-        {
-            PlayerStats.Instance.AddCoins(coinsEarned);
-            OnCoinsChanged?.Invoke(PlayerStats.Instance.coins);
-        }
-
-        carriedTrash = 0;
-        OnCarriedTrashChanged?.Invoke(carriedTrash);
-    }*/
-
     public void ConvertCarriedTrashToCoins()
     {
         if (CurrentState == GameState.GameOver) return;
@@ -199,6 +148,8 @@ public class GameManager : MonoBehaviour
 
         carriedTrash = 0;
         OnCarriedTrashChanged?.Invoke(carriedTrash);
+
+        SoundEffectManager.Play("Coin");
 
         EnterShopPhase();
     }
@@ -260,6 +211,34 @@ public class GameManager : MonoBehaviour
 
             if (spawnManager != null)
                 spawnManager.StopSpawning();
+
+                if (PlayerStats.Instance != null)
+                    PlayerStats.Instance.ResetStats();
         }
+    }
+
+    public void ReturnToMainMenu()
+    {
+        // reset round data
+        currentRound = 1;
+        carriedTrash = 0;
+        timeRemaining = 0f;
+
+        // stop gameplay systems
+        if (spawnManager != null)
+            spawnManager.StopSpawning();
+
+        // reset player position
+        if (playerTransform != null && playerStartPoint != null)
+        {
+            playerTransform.position = playerStartPoint.position;
+
+            Rigidbody2D rb = playerTransform.GetComponent<Rigidbody2D>();
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+        }
+
+        // go back to menu state
+        SetState(GameState.MainMenu);
     }
 }

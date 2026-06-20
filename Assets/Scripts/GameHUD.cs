@@ -15,6 +15,10 @@ public class GameHUD : MonoBehaviour
     public TMP_Text coinsText;
     public TMP_Text statusText; // shows prompts like "Return to drop-off!"
 
+    [Header("Panels")]
+    public GameObject gameOverPanel;
+    public GameObject hudPanel;
+
     private bool isSubscribed = false;
 
     private void OnEnable()
@@ -102,10 +106,10 @@ public class GameHUD : MonoBehaviour
 
     private void HandleCoinsChanged(int coins)
     {
-        if (coinsText != null) coinsText.text = $"Coins: {coins}";
+        if (coinsText != null) coinsText.text = $"Highest Coins Collected: {coins}";
     }
 
-    private void HandleStateChanged(GameManager.GameState state)
+    /*private void HandleStateChanged(GameManager.GameState state)
     {
         if (statusText == null) return;
 
@@ -119,14 +123,42 @@ public class GameHUD : MonoBehaviour
             case GameManager.GameState.Playing:
                 statusText.text = "Shoot trash and deposit anytime!";
                 break;
-            /*case GameManager.GameState.DropOff:
-                statusText.text = "Time's up! Return to the drop-off point!";
-                break;*/
             case GameManager.GameState.Shop:
                 statusText.text = "Round complete! Spend your coins.";
                 break;
             case GameManager.GameState.GameOver:
                 statusText.text = "Times up! Game Over!";
+                break;
+        }
+    }*/
+
+    private void HandleStateChanged(GameManager.GameState state)
+    {
+        if (statusText == null) return;
+
+        // default panel behavior
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(state == GameManager.GameState.GameOver);
+
+        if (hudPanel != null)
+            hudPanel.SetActive(state != GameManager.GameState.GameOver);
+
+        switch (state)
+        {
+            case GameManager.GameState.MainMenu:
+                statusText.text = "";
+                break;
+
+            case GameManager.GameState.Playing:
+                statusText.text = "Shoot trash and deposit anytime!";
+                break;
+
+            case GameManager.GameState.Shop:
+                statusText.text = "Round complete! Spend your coins.";
+                break;
+
+            case GameManager.GameState.GameOver:
+                statusText.text = "Game Over!";
                 break;
         }
     }
