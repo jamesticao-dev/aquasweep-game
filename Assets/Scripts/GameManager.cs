@@ -18,7 +18,14 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public enum GameState { Playing, DropOff, Shop, GameOver }
+    //public enum GameState { MainMenu, Playing, DropOff, Shop, GameOver }
+    public enum GameState
+    {
+        MainMenu,
+        Playing,
+        Shop,
+        GameOver
+    }
 
     [Header("References")]
     public SpawnManager spawnManager;
@@ -29,7 +36,7 @@ public class GameManager : MonoBehaviour
     public int currentRound = 1;
     public int maxRounds = 0; // 0 = infinite rounds
 
-    public GameState CurrentState { get; private set; } = GameState.Playing;
+    public GameState CurrentState { get; private set; } = GameState.MainMenu;
 
     private float timeRemaining;
     private int carriedTrash = 0;
@@ -53,6 +60,24 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // Wait one frame before broadcasting the initial state. This guarantees every
+        // listener's own Start()/OnEnable() (GameHUD, MainMenu, UpgradeShop, etc.) has
+        // already run and subscribed to our events, regardless of script execution order.
+        StartCoroutine(BroadcastInitialStateNextFrame());
+    }
+
+    private System.Collections.IEnumerator BroadcastInitialStateNextFrame()
+    {
+        yield return null;
+        SetState(GameState.MainMenu);
+    }
+
+    /// <summary>
+    /// Wire this to the Play button's OnClick(). Begins round 1 from the main menu.
+    /// </summary>
+    public void PlayButtonPressed()
+    {
+        if (CurrentState != GameState.MainMenu) return;
         StartRound();
     }
 
@@ -65,9 +90,16 @@ public class GameManager : MonoBehaviour
 
         OnTimerUpdated?.Invoke(timeRemaining);
 
-        if (timeRemaining <= 0f)
+        /*if (timeRemaining <= 0f)
         {
             EnterDropOffPhase();
+        }*/
+        if (timeRemaining <= 0f)
+        {
+            SetState(GameState.GameOver);
+
+            if (spawnManager != null)
+                spawnManager.StopSpawning();
         }
     }
 
@@ -94,7 +126,7 @@ public class GameManager : MonoBehaviour
         if (spawnManager != null) spawnManager.StartSpawning();
     }
 
-    private void EnterDropOffPhase()
+    /*private void EnterDropOffPhase()
     {
         SetState(GameState.DropOff);
         if (spawnManager != null) spawnManager.StopSpawning();
@@ -104,9 +136,9 @@ public class GameManager : MonoBehaviour
         {
             EnterShopPhase();
         }
-    }
+    }*/
 
-    public void ConvertCarriedTrashToCoins()
+    /*public void ConvertCarriedTrashToCoins()
     {
         if (CurrentState != GameState.DropOff) return;
         if (carriedTrash <= 0) return;
@@ -125,9 +157,55 @@ public class GameManager : MonoBehaviour
 
         EnterShopPhase();
     }
+    public void ConvertCarriedTrashToCoins()
+    {
+        if (CurrentState == GameState.GameOver)
+            return;
+
+        if (carriedTrash <= 0)
+            return;
+
+        float coinValue = PlayerStats.Instance != null ?
+                        PlayerStats.Instance.CurrentTrashCoinValue : 1f;
+
+        int coinsEarned = Mathf.RoundToInt(carriedTrash * coinValue);
+
+        if (PlayerStats.Instance != null)
+        {
+            PlayerStats.Instance.AddCoins(coinsEarned);
+            OnCoinsChanged?.Invoke(PlayerStats.Instance.coins);
+        }
+
+        carriedTrash = 0;
+        OnCarriedTrashChanged?.Invoke(carriedTrash);
+    }*/
+
+    public void ConvertCarriedTrashToCoins()
+    {
+        if (CurrentState == GameState.GameOver) return;
+        if (carriedTrash <= 0) return;
+
+        float coinValue = PlayerStats.Instance != null
+            ? PlayerStats.Instance.CurrentTrashCoinValue
+            : 1f;
+
+        int coinsEarned = Mathf.RoundToInt(carriedTrash * coinValue);
+
+        if (PlayerStats.Instance != null)
+        {
+            PlayerStats.Instance.AddCoins(coinsEarned);
+            OnCoinsChanged?.Invoke(PlayerStats.Instance.coins);
+        }
+
+        carriedTrash = 0;
+        OnCarriedTrashChanged?.Invoke(carriedTrash);
+
+        EnterShopPhase();
+    }
 
     private void EnterShopPhase()
     {
+        if (spawnManager != null) spawnManager.StopSpawning();
         SetState(GameState.Shop);
         // UpgradeShop UI script should listen for this state and open its menu.
     }
@@ -172,9 +250,16 @@ public class GameManager : MonoBehaviour
         OnTimePenaltyApplied?.Invoke(seconds);
         OnTimerUpdated?.Invoke(timeRemaining);
 
-        if (timeRemaining <= 0f)
+        /*if (timeRemaining <= 0f)
         {
             EnterDropOffPhase();
+        }*/
+        if (timeRemaining <= 0f)
+        {
+            SetState(GameState.GameOver);
+
+            if (spawnManager != null)
+                spawnManager.StopSpawning();
         }
     }
 }

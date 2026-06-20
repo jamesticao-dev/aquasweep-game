@@ -34,6 +34,24 @@ public class SubmarineController : MonoBehaviour
 
     private void Update()
     {
+        // Freeze controls in menu/shop/game-over. Movement stays active during
+        // Playing AND DropOff (player needs to swim to the drop-off zone after
+        // the timer ends), so we explicitly check for the blocked states.
+        if (GameManager.Instance != null)
+        {
+            var state = GameManager.Instance.CurrentState;
+            bool controlsBlocked = state == GameManager.GameState.MainMenu
+                || state == GameManager.GameState.Shop
+                || state == GameManager.GameState.GameOver;
+
+            if (controlsBlocked)
+            {
+                moveInput = Vector2.zero;
+                rb.linearVelocity = Vector2.zero;
+                return;
+            }
+        }
+
         // --- Read input ---
         float x = Input.GetAxisRaw("Horizontal"); // A/D
         float y = Input.GetAxisRaw("Vertical");   // W/S

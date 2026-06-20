@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// Upgrade shop UI logic. Shows/hides itself based on GameManager's state,
@@ -16,25 +16,54 @@ public class UpgradeShop : MonoBehaviour
     public GameObject shopPanel; // the whole shop UI, enabled/disabled based on game state
 
     [Header("Display (optional, hook up as desired)")]
-    public Text coinsText;
-    public Text roundText;
+    public TMP_Text coinsText;
+    public TMP_Text roundText;
+
+    private bool isSubscribed = false;
 
     private void OnEnable()
     {
-        if (GameManager.Instance != null)
+        TrySubscribe();
+    }
+
+    private void Start()
+    {
+        // Fallback: if OnEnable ran before GameManager.Awake() set its Instance
+        // (Unity doesn't guarantee execution order by default), try again here.
+        if (!isSubscribed)
         {
-            GameManager.Instance.OnStateChanged += HandleStateChanged;
-            GameManager.Instance.OnCoinsChanged += HandleCoinsChanged;
+            TrySubscribe();
         }
+    }
+
+    private void TrySubscribe()
+    {
+        if (isSubscribed) return;
+
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[UpgradeShop] GameManager.Instance was null when trying to subscribe. " +
+                "If this warning appears in OnEnable but not Start, it's an execution-order issue " +
+                "(fixed automatically by the Start() retry). If it persists, GameManager is missing from the scene.");
+            return;
+        }
+
+        GameManager.Instance.OnStateChanged += HandleStateChanged;
+        GameManager.Instance.OnCoinsChanged += HandleCoinsChanged;
+        isSubscribed = true;
+
+        // Push current state immediately in case GameManager already entered Shop
+        // state before we subscribed (covers edge cases beyond the normal flow).
+        HandleStateChanged(GameManager.Instance.CurrentState);
     }
 
     private void OnDisable()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnStateChanged -= HandleStateChanged;
-            GameManager.Instance.OnCoinsChanged -= HandleCoinsChanged;
-        }
+        if (!isSubscribed || GameManager.Instance == null) return;
+
+        GameManager.Instance.OnStateChanged -= HandleStateChanged;
+        GameManager.Instance.OnCoinsChanged -= HandleCoinsChanged;
+        isSubscribed = false;
     }
 
     private void HandleStateChanged(GameManager.GameState newState)

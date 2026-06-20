@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// Minimal HUD: shows round timer, carried trash count, and total coins.
@@ -10,41 +10,82 @@ using UnityEngine.UI;
 public class GameHUD : MonoBehaviour
 {
     [Header("UI References")]
-    public Text timerText;
-    public Text carriedTrashText;
-    public Text coinsText;
-    public Text statusText; // shows prompts like "Return to drop-off!"
+    public TMP_Text timerText;
+    public TMP_Text carriedTrashText;
+    public TMP_Text coinsText;
+    public TMP_Text statusText; // shows prompts like "Return to drop-off!"
+
+    private bool isSubscribed = false;
 
     private void OnEnable()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnTimerUpdated += HandleTimerUpdated;
-            GameManager.Instance.OnCarriedTrashChanged += HandleCarriedTrashChanged;
-            GameManager.Instance.OnCoinsChanged += HandleCoinsChanged;
-            GameManager.Instance.OnStateChanged += HandleStateChanged;
-            GameManager.Instance.OnTimePenaltyApplied += HandleTimePenalty;
-        }
+        TrySubscribe();
     }
 
     private void OnDisable()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnTimerUpdated -= HandleTimerUpdated;
-            GameManager.Instance.OnCarriedTrashChanged -= HandleCarriedTrashChanged;
-            GameManager.Instance.OnCoinsChanged -= HandleCoinsChanged;
-            GameManager.Instance.OnStateChanged -= HandleStateChanged;
-            GameManager.Instance.OnTimePenaltyApplied -= HandleTimePenalty;
-        }
+        Unsubscribe();
     }
 
     private void Start()
     {
+        // Fallback: if OnEnable ran before GameManager.Awake() set its Instance
+        // (Unity doesn't guarantee execution order by default), try again here.
+        if (!isSubscribed)
+        {
+            TrySubscribe();
+        }
+
         if (PlayerStats.Instance != null && coinsText != null)
         {
-            coinsText.text = $"Coins: {PlayerStats.Instance.coins}";
+            coinsText.text = $"Highest coins earned: {PlayerStats.Instance.coins}";
         }
+        else if (PlayerStats.Instance == null)
+        {
+            Debug.LogWarning("[GameHUD] PlayerStats.Instance is null in Start(). " +
+                "Make sure a PlayerStats object exists in the scene and has run its Awake() before this.");
+        }
+    }
+
+    private void TrySubscribe()
+    {
+        if (isSubscribed) return;
+
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[GameHUD] GameManager.Instance was null when trying to subscribe. " +
+                "If this warning appears in OnEnable but not Start, it's an execution-order issue " +
+                "(fixed automatically by the Start() retry). If it persists, GameManager is missing from the scene.");
+            return;
+        }
+
+        GameManager.Instance.OnTimerUpdated += HandleTimerUpdated;
+        GameManager.Instance.OnCarriedTrashChanged += HandleCarriedTrashChanged;
+        GameManager.Instance.OnCoinsChanged += HandleCoinsChanged;
+        GameManager.Instance.OnStateChanged += HandleStateChanged;
+        GameManager.Instance.OnTimePenaltyApplied += HandleTimePenalty;
+        isSubscribed = true;
+
+        // Immediately push current values so the HUD isn't blank/stale until the next change
+        // (in case GameManager.Start() already ran its StartRound() before we subscribed).
+        HandleStateChanged(GameManager.Instance.CurrentState);
+        if (PlayerStats.Instance != null)
+        {
+            HandleTimerUpdated(PlayerStats.Instance.CurrentRoundTime);
+        }
+        HandleCarriedTrashChanged(0);
+    }
+
+    private void Unsubscribe()
+    {
+        if (!isSubscribed || GameManager.Instance == null) return;
+
+        GameManager.Instance.OnTimerUpdated -= HandleTimerUpdated;
+        GameManager.Instance.OnCarriedTrashChanged -= HandleCarriedTrashChanged;
+        GameManager.Instance.OnCoinsChanged -= HandleCoinsChanged;
+        GameManager.Instance.OnStateChanged -= HandleStateChanged;
+        GameManager.Instance.OnTimePenaltyApplied -= HandleTimePenalty;
+        isSubscribed = false;
     }
 
     private void HandleTimerUpdated(float timeRemaining)
@@ -70,17 +111,22 @@ public class GameHUD : MonoBehaviour
 
         switch (state)
         {
+            case GameManager.GameState.MainMenu:
+                statusText.text = "";
+                if (timerText != null) timerText.text = "";
+                if (carriedTrashText != null) carriedTrashText.text = "";
+                break;
             case GameManager.GameState.Playing:
-                statusText.text = "Shoot trash! Avoid fish!";
+                statusText.text = "Shoot trash and deposit anytime!";
                 break;
-            case GameManager.GameState.DropOff:
+            /*case GameManager.GameState.DropOff:
                 statusText.text = "Time's up! Return to the drop-off point!";
-                break;
+                break;*/
             case GameManager.GameState.Shop:
                 statusText.text = "Round complete! Spend your coins.";
                 break;
             case GameManager.GameState.GameOver:
-                statusText.text = "Game Over!";
+                statusText.text = "Times up! Game Over!";
                 break;
         }
     }

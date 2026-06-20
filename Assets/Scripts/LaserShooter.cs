@@ -27,6 +27,11 @@ public class LaserShooter : MonoBehaviour
     {
         fireCooldownTimer -= Time.deltaTime;
 
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+        {
+            return; // no shooting outside the active round
+        }
+
         bool wantsToFire = holdToFire ? Input.GetMouseButton(0) : Input.GetMouseButtonDown(0);
 
         if (wantsToFire && fireCooldownTimer <= 0f)
