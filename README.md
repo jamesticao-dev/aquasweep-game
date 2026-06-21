@@ -1,4 +1,4 @@
-#🌊 Ocean Cleanup Shooter – Unity Arcade Prototype
+# 🌊 Aquasweep
 Ocean Cleanup Shooter is a fast-paced arcade-style Unity game where players dive underwater, shoot trash, avoid marine life, and return to the surface to convert collected waste into coins. Use upgrades to survive longer as the difficulty increases through infinite rounds until the timer runs out.
 
 ---
