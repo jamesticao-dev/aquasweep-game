@@ -21,9 +21,13 @@ Ocean Cleanup Shooter is a fast-paced arcade-style Unity game where players dive
 
 ### 🛠️ Tools & Technologies
 Engine: Unity (C#)
+
 Gameplay Systems: Custom timer, upgrade, and scoring systems
+
 Style: Arcade / Survival Shooter
-Development Time: (add your dev time if you want)
+
+Development Time: 48h
+
 Status: Prototype
 
 ---
