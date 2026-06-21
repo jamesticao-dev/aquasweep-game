@@ -31,7 +31,9 @@ Status: Prototype
 ### 👥 Team
 Programmers:
 - James Ticao
+  
 Artists:
 - Shannon Veran
+  
 Audio:
 - Sounds sourced from Pixabay
